@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Buffet Libre - Camarero</title>
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <script defer src="camarero.js"></script>
+    <style>
+      body {
+        font-family: sans-serif;
+        padding: 20px;
+        background: #eef2f3;
+      }
+      .pedido {
+        border: 1px solid #ccc;
+        padding: 10px;
+        margin: 10px;
+        border-radius: 8px;
+        background: white;
+      }
+      select {
+        margin-top: 5px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>👨‍🍳 Panel del Camarero</h1>
+    <div id="pedidos"></div>
+  </body>
+</html>

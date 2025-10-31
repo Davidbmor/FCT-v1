@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Buffet Libre - Cliente</title>
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <script defer src="cliente.js"></script>
+    <style>
+      body {
+        font-family: sans-serif;
+        padding: 20px;
+        background: #fafafa;
+      }
+      .producto {
+        border: 1px solid #ccc;
+        padding: 10px;
+        margin: 5px;
+        border-radius: 8px;
+      }
+      .carrito {
+        margin-top: 20px;
+        border-top: 2px solid #333;
+        padding-top: 10px;
+      }
+      button {
+        margin-top: 5px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>🍽 Buffet Libre (Cliente)</h1>
+    <div id="productos"></div>
+
+    <div class="carrito">
+      <h2>🛒 Tu Pedido</h2>
+      <ul id="carrito"></ul>
+      <button id="enviarPedido">Enviar Pedido</button>
+    </div>
+
+    <div id="estado"></div>
+  </body>
+</html>
