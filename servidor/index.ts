@@ -15,7 +15,6 @@ app.use(express.json());
 const httpServer = createServer(app);
 const io = new Server(httpServer, { cors: { origin: "*" } });
 
-// --- Conexión MySQL ---
 const db = await mysql.createConnection({
   host: process.env.DB_HOST,
   user: process.env.DB_USER,
