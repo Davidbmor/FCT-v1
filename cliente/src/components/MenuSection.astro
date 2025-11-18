@@ -8,13 +8,14 @@ const productos = await obtenerProductos();
 
 <h1 class="tittle-menu-section">{section}</h1>
 <div class="plate-cards-container">
-    {
-        productos.map((p: any) => (
-            <PlateCard
-                name={p.nombre}
-                amount={p.cantidad ?? 1}
-                img="/src/assets/img/sushi.webp"
-            />
-        ))
-    }
+  {
+    productos.map((p: any) => (
+      <PlateCard
+        name={p.nombre}
+        amount={p.cantidad ?? 1}
+        img="/src/assets/img/sushi.webp"
+        producto={p}
+      />
+    ))
+  }
 </div>

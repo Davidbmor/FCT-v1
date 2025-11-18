@@ -1,5 +1,5 @@
 ---
-import CartComponents from "./CartComponents.astro"
+import CartIsland from "./islands/CartIsland.jsx";
 ---
 
 <div class="Carrito">
@@ -9,15 +9,6 @@ import CartComponents from "./CartComponents.astro"
       <span></span>
     </div>
   </div>
-  <div class="object">
-    <div class="object-img"></div>
-    <div class="object-content">
-      <CartComponents name="" amount="" price="" ></CartComponents>
-    </div>
-  </div>
-  <div class="total">
-    <table>
-      <a class="order" href="#">Ordenar Comanda</a>
-    </table>
-  </div>
+
+  <CartIsland client:load />
 </div>

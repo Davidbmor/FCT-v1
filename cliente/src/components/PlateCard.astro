@@ -1,5 +1,7 @@
 ---
-const { name, amount, img } = Astro.props;
+import AddToCartIsland from "./islands/AddToCartIsland.jsx";
+
+const { name, amount, img , producto} = Astro.props;
 ---
 
 <div class="plate-card">
@@ -8,7 +10,7 @@ const { name, amount, img } = Astro.props;
     <h2 class="plate-name">{name}</h2>
     <p class="plate-amount">Cantidad : {amount}</p>
     <div class="plate-buttons">
-      <a class="order" href="#"><i class="fa-solid fa-plus"></i> Pedir</a>
+      <AddToCartIsland client:load producto={producto} />
       <a class="info" href="#"><i class="fa-solid fa-circle-info"></i> Info</a>
     </div>
   </div>
