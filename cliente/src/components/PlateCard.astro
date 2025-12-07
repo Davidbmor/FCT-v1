@@ -2,10 +2,11 @@
 import AddToCartIsland from "./islands/AddToCartIsland.jsx";
 
 const { name, amount, img, producto } = Astro.props;
+const imgUrl = producto?.url_imagen ? `http://localhost:3000${producto.url_imagen}` : 'http://localhost:4321/img/sushi.webp';
 ---
 
 <div class="plate-card">
-  <div class="plate-img">
+  <div class="plate-img" style={`background-image: url('${imgUrl}'); background-size: cover; background-position: center;`}>
     <div class="alergies"></div>
   </div>
   <div class="plate-details">

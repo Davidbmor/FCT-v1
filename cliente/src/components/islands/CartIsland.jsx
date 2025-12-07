@@ -41,13 +41,11 @@ export default function CartIsland() {
   return (
     <>
       {items.map((item) => (
-        <div class="object">
+        <div class="object" key={item.id}>
           <div 
             class="object-img" 
             style={{
-              backgroundImage: item.url_imagen 
-                ? `url(http://localhost:3000${item.url_imagen})` 
-                : 'url(/src/assets/img/sushi.webp)',
+              backgroundImage: item.url_imagen ? `url(http://localhost:3000${item.url_imagen})` : 'url(http://localhost:4321/img/sushi.webp)',
               backgroundSize: 'cover',
               backgroundPosition: 'center'
             }}
