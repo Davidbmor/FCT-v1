@@ -167,4 +167,29 @@ export class ProductoModel {
       );
     }
   }
+
+  async obtenerTipos(): Promise<string[]> {
+    const [rows] = await this.db.query(`
+      SELECT COLUMN_TYPE 
+      FROM INFORMATION_SCHEMA.COLUMNS 
+      WHERE TABLE_NAME = 'productos' 
+      AND COLUMN_NAME = 'tipo'
+      AND TABLE_SCHEMA = DATABASE()
+    `);
+
+    if ((rows as any[]).length === 0) return [];
+
+    const columnType = (rows as any[])[0].COLUMN_TYPE;
+    // El formato es: enum('valor1','valor2','valor3')
+    const match = columnType.match(/enum\((.*)\)/i);
+    
+    if (!match) return [];
+
+    // Extraer los valores del ENUM y limpiar las comillas
+    const tipos = match[1]
+      .split(',')
+      .map((tipo: string) => tipo.replace(/'/g, '').trim());
+
+    return tipos;
+  }
 }

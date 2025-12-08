@@ -169,4 +169,14 @@ export class ProductoController {
       res.status(500).json({ error: "Error al eliminar el producto" });
     }
   };
+
+  obtenerTipos = async (req: Request, res: Response) => {
+    try {
+      const tipos = await this.productoModel.obtenerTipos();
+      res.json(tipos);
+    } catch (err) {
+      console.error("Error obteniendo tipos:", err);
+      res.status(500).json({ error: "Error al obtener los tipos" });
+    }
+  };
 }

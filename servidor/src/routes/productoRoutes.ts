@@ -8,6 +8,8 @@ export const createProductoRoutes = (productoController: ProductoController) => 
 
   router.get("/productos/todos", productoController.obtenerTodosProductos);
 
+  router.get("/productos/tipos", productoController.obtenerTipos);
+
   router.get("/productos/:id", productoController.obtenerProductoPorId);
 
   router.post("/productos", productoController.añadirProducto);

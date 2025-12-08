@@ -54,11 +54,9 @@ export default function FormularioProducto() {
 
   const cargarTipos = async () => {
     try {
-      const res = await fetch(`${API_URL}/productos`);
+      const res = await fetch(`${API_URL}/productos/tipos`);
       const data = await res.json();
-      // Obtener tipos únicos de los productos
-      const tiposUnicos = [...new Set(data.map(p => p.tipo).filter(Boolean))];
-      setTipos(tiposUnicos);
+      setTipos(data);
     } catch (err) {
       console.error('Error cargando tipos:', err);
     }
