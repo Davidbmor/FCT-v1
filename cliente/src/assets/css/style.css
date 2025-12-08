@@ -208,7 +208,7 @@ header {
             align-items: center;
 
             .plate-card {
-                width: 250px;
+                width: 300px;
                 height: 270px;
                 border-radius: 5%;
                 margin: 0 3%;
@@ -1322,7 +1322,7 @@ form>div:last-child {
     }
 }
 
-footer {
+.footer-icon {
     position: fixed;
     bottom: 0;
     right: 45px;
@@ -2338,7 +2338,6 @@ footer {
 .order:hover,
 .info:hover,
 .button-cart:hover,
-footer:hover,
 .selector:hover {
     transform: scale(1.05);
 }
