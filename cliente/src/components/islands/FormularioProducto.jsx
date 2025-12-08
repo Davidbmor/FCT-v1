@@ -4,6 +4,7 @@ const API_URL = 'http://localhost:3000';
 
 export default function FormularioProducto() {
   const [alergenos, setAlergenos] = useState([]);
+  const [tipos, setTipos] = useState([]);
   const [editando, setEditando] = useState(null);
   
   const [formData, setFormData] = useState({
@@ -19,6 +20,7 @@ export default function FormularioProducto() {
 
   useEffect(() => {
     cargarAlergenos();
+    cargarTipos();
     
     window.editarProductoGlobal = (producto) => {
       setEditando(producto);
@@ -47,6 +49,18 @@ export default function FormularioProducto() {
       setAlergenos(data);
     } catch (err) {
       console.error('Error cargando alergenos:', err);
+    }
+  };
+
+  const cargarTipos = async () => {
+    try {
+      const res = await fetch(`${API_URL}/productos`);
+      const data = await res.json();
+      // Obtener tipos únicos de los productos
+      const tiposUnicos = [...new Set(data.map(p => p.tipo).filter(Boolean))];
+      setTipos(tiposUnicos);
+    } catch (err) {
+      console.error('Error cargando tipos:', err);
     }
   };
 
@@ -194,14 +208,11 @@ export default function FormularioProducto() {
             required={!editando}
           >
             <option value="">Seleccionar tipo...</option>
-            <option value="nigiri">Nigiri</option>
-            <option value="sashimi">Sashimi</option>
-            <option value="uramaki">Uramaki</option>
-            <option value="ramen">Ramen</option>
-            <option value="gyoza">Gyoza</option>
-            <option value="karage">Karage</option>
-            <option value="postre">Postre</option>
-            <option value="bebida">Bebida</option>
+            {tipos.map(tipo => (
+              <option key={tipo} value={tipo.toLowerCase()}>
+                {tipo.charAt(0).toUpperCase() + tipo.slice(1)}
+              </option>
+            ))}
           </select>
         </div>
 

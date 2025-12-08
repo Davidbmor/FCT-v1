@@ -115,6 +115,7 @@ export default function ClientOrdersIsland() {
     localStorage.removeItem('numeroMesa');
     localStorage.removeItem('carrito');
     localStorage.removeItem('historialPedidos');
+    localStorage.removeItem('comensales');
     
     // Limpiar chats
     const keys = Object.keys(localStorage);
@@ -131,9 +132,17 @@ export default function ClientOrdersIsland() {
   };
 
   const calcularTotalGeneral = () => {
-    return pedidos.reduce((total, pedido) => {
+    const pedidoTotal = pedidos.reduce((total, pedido) => {
       return total + parseFloat(calcularTotalPedido(pedido.items));
-    }, 0).toFixed(2);
+    }, 0);
+    
+    // Obtener precio del buffet del localStorage
+    const comensalesData = localStorage.getItem('comensales');
+    const precioBuffet = comensalesData 
+      ? parseFloat(JSON.parse(comensalesData).precioBuffet || 0)
+      : 0;
+    
+    return (pedidoTotal + precioBuffet).toFixed(2);
   };
 
   return (
@@ -232,6 +241,42 @@ export default function ClientOrdersIsland() {
             <div class="modal-pago-info">
               <p><strong>Mesa:</strong> {numeroMesa}</p>
               <p><strong>Número de pedidos:</strong> {pedidos.length}</p>
+              
+              {(() => {
+                const comensalesData = localStorage.getItem('comensales');
+                const precioBuffet = comensalesData 
+                  ? parseFloat(JSON.parse(comensalesData).precioBuffet || 0)
+                  : 0;
+                const pedidoTotal = pedidos.reduce((total, pedido) => {
+                  return total + parseFloat(calcularTotalPedido(pedido.items));
+                }, 0);
+                
+                const comensales = comensalesData ? JSON.parse(comensalesData) : null;
+                
+                return (
+                  <>
+                    {comensales && precioBuffet > 0 && (
+                      <div class="modal-desglose">
+                        <p>
+                          <i class="fa-solid fa-utensils"></i>
+                          <span>Buffet ({comensales.adultos} adultos + {comensales.ninos} niños):</span>
+                          <strong>{precioBuffet.toFixed(2)}€</strong>
+                        </p>
+                      </div>
+                    )}
+                    {pedidoTotal > 0 && (
+                      <div class="modal-desglose">
+                        <p>
+                          <i class="fa-solid fa-plate-wheat"></i>
+                          <span>Productos especiales:</span>
+                          <strong>{pedidoTotal.toFixed(2)}€</strong>
+                        </p>
+                      </div>
+                    )}
+                  </>
+                );
+              })()}
+              
               <p class="modal-total"><strong>Total a pagar:</strong> {calcularTotalGeneral()}€</p>
             </div>
 

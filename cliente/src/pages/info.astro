@@ -7,33 +7,33 @@ let productId = null;
 
 // Método 1: Astro.url
 try {
-  productId = Astro.url.searchParams.get('id');
-  console.log('Method 1 (Astro.url):', productId);
+    productId = Astro.url.searchParams.get("id");
+    console.log("Method 1 (Astro.url):", productId);
 } catch (e) {
-  console.log('Method 1 failed:', e);
+    console.log("Method 1 failed:", e);
 }
 
 // Método 2: new URL con Astro.request.url
 if (!productId) {
-  try {
-    const url = new URL(Astro.request.url);
-    productId = url.searchParams.get('id');
-    console.log('Method 2 (new URL):', productId);
-  } catch (e) {
-    console.log('Method 2 failed:', e);
-  }
+    try {
+        const url = new URL(Astro.request.url);
+        productId = url.searchParams.get("id");
+        console.log("Method 2 (new URL):", productId);
+    } catch (e) {
+        console.log("Method 2 failed:", e);
+    }
 }
 
 // Método 3: Params de Astro (por si acaso)
 if (!productId && Astro.params.id) {
-  productId = Astro.params.id;
-  console.log('Method 3 (Astro.params):', productId);
+    productId = Astro.params.id;
+    console.log("Method 3 (Astro.params):", productId);
 }
 
-console.log('=== INFO.ASTRO DEBUG ===');
-console.log('Full request URL:', Astro.request.url);
-console.log('Astro.url:', Astro.url?.toString());
-console.log('Final Product ID:', productId);
+console.log("=== INFO.ASTRO DEBUG ===");
+console.log("Full request URL:", Astro.request.url);
+console.log("Astro.url:", Astro.url?.toString());
+console.log("Final Product ID:", productId);
 
 let producto = null;
 let error = null;
@@ -41,26 +41,28 @@ let error = null;
 if (productId) {
     try {
         const apiUrl = `http://localhost:3000/productos/${productId}`;
-        console.log('Fetching from:', apiUrl);
+        console.log("Fetching from:", apiUrl);
         const response = await fetch(apiUrl);
-        console.log('Response status:', response.status);
-        
+        console.log("Response status:", response.status);
+
         if (response.ok) {
             producto = await response.json();
-            console.log('Product loaded successfully:', producto.nombre);
+            console.log("Product loaded successfully:", producto.nombre);
         } else {
             error = `Error ${response.status}: ${await response.text()}`;
-            console.log('Error response:', error);
+            console.log("Error response:", error);
         }
     } catch (err: any) {
         error = `Error de conexión: ${err?.message || String(err)}`;
-        console.log('Fetch error:', err);
+        console.log("Fetch error:", err);
     }
 } else {
-    console.log('No productId found in URL');
+    console.log("No productId found in URL");
 }
 
-const imgUrl = producto?.url_imagen ? `http://localhost:3000${producto.url_imagen}` : 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8Zm9vZHxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&w=800&q=60';
+const imgUrl = producto?.url_imagen
+    ? `http://localhost:3000${producto.url_imagen}`
+    : "https://images.unsplash.com/photo-1504674900247-0877df9cc836?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8Zm9vZHxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&w=800&q=60";
 ---
 
 <html lang="es">
@@ -78,53 +80,75 @@ const imgUrl = producto?.url_imagen ? `http://localhost:3000${producto.url_image
     <body>
         <Header />
 
-        {!productId && (
-            <div style="padding: 20px; text-align: center;">
-                <h1>No se proporcionó ID de producto</h1>
-                <a href="/carta">Volver a la carta</a>
-            </div>
-        )}
-
-        {error && (
-            <div style="padding: 20px; text-align: center;">
-                <h1>Error al cargar el producto</h1>
-                <p style="color: red;">{error}</p>
-                <p>ID del producto: {productId}</p>
-                <a href="/carta">Volver a la carta</a>
-            </div>
-        )}
-
-        {producto && (
-            <div class="info-container">
-                <div class="info-img"  style={`background-image: url('${imgUrl}'); background-size: cover; background-position: center;`}>
-                    <a href="/carta" class="button-back"></a>
+        {
+            !productId && (
+                <div style="padding: 20px; text-align: center;">
+                    <h1>No se proporcionó ID de producto</h1>
+                    <a href="/carta">Volver a la carta</a>
                 </div>
-                <div class="info-content">
-                    <h1 class="info-title">{producto.nombre}</h1>
-                    <div class="info-context-text">
-                        <p>
-                            {producto.descripcion || 'No hay descripción disponible.'}
-                        </p>
-                        <p><span>Precio :</span> {producto.precio}€</p>
-                        <p><span>Cantidad :</span> {producto.cantidad}</p>
+            )
+        }
 
-                        <div class="alergies">
-                            {producto.alergenos && producto.alergenos.length > 0 && (
-                                <div>
-                                    <p><span>Alérgenos:</span></p>
-                                    <div class="alergies-list">
-                                        {producto.alergenos.map((alergeno: any) => (
-                                            <div class="alergeno-item" title={alergeno.nombre}>
-                                                <span set:html={alergeno.svg}></span>
+        {
+            error && (
+                <div style="padding: 20px; text-align: center;">
+                    <h1>Error al cargar el producto</h1>
+                    <p style="color: red;">{error}</p>
+                    <p>ID del producto: {productId}</p>
+                    <a href="/carta">Volver a la carta</a>
+                </div>
+            )
+        }
+
+        {
+            producto && (
+                <div class="info-container">
+                    <div
+                        class="info-img"
+                        style={`background-image: url('${imgUrl}'); background-size: cover; background-position: center;`}
+                    >
+                        <a href="/carta" class="button-back" />
+                    </div>
+                    <div class="info-content">
+                        <h1 class="info-title">{producto.nombre}</h1>
+                        <div class="info-context-text">
+                            <p>
+                                {producto.descripcion ||
+                                    "No hay descripción disponible."}
+                            </p>
+                            <p>
+                                <span>Precio :</span> {producto.precio}€
+                            </p>
+                            <p>
+                                <span>Cantidad :</span> {producto.cantidad}
+                            </p>
+
+                            <div class="alergies">
+                                {producto.alergenos &&
+                                    producto.alergenos.length > 0 && (
+                                        <div>
+                                            <p>
+                                                <span>Alérgenos:</span>
+                                            </p>
+                                            <div class="alergies-list">
+                                                {producto.alergenos.map(
+                                                    (alergeno: any) => (
+                                                        <div
+                                                            class="alergeno-item"
+                                                            title={alergeno.nombre}
+                                                        >
+                                                            <span set:html={alergeno.svg} />
+                                                        </div>
+                                                    )
+                                                )}
                                             </div>
-                                        ))}
-                                    </div>
-                                </div>
-                            )}
+                                        </div>
+                                    )}
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        )}
+            )
+        }
     </body>
 </html>

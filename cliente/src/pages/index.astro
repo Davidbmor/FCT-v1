@@ -252,7 +252,6 @@ import "../assets/css/style.css";
       function createEpicTransition(e) {
         e.preventDefault();
         const button = e.currentTarget;
-        const targetUrl = button.href;
         
         // Crear overlay de transición
         const overlay = document.createElement('div');
@@ -273,9 +272,9 @@ import "../assets/css/style.css";
           ripple.classList.add('active');
         });
         
-        // Redirigir después de la animación
+        // Redirigir al modal de comensales después de la animación
         setTimeout(() => {
-          window.location.href = targetUrl;
+          window.location.href = '/comensales';
         }, 800);
       }
 
