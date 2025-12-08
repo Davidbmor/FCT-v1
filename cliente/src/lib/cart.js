@@ -1,6 +1,32 @@
 export class Carrito {
   constructor() {
     this.items = {};
+    this.cargarDesdeLocalStorage();
+  }
+
+  cargarDesdeLocalStorage() {
+    if (typeof window !== 'undefined') {
+      try {
+        const carritoGuardado = localStorage.getItem('carrito');
+        if (carritoGuardado) {
+          this.items = JSON.parse(carritoGuardado);
+          console.log(`🛒 Carrito restaurado: ${Object.keys(this.items).length} productos`);
+        }
+      } catch (error) {
+        console.error('Error al cargar carrito:', error);
+        this.items = {};
+      }
+    }
+  }
+
+  guardarEnLocalStorage() {
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.setItem('carrito', JSON.stringify(this.items));
+      } catch (error) {
+        console.error('Error al guardar carrito:', error);
+      }
+    }
   }
 
   agregarProducto(producto) {
@@ -9,6 +35,7 @@ export class Carrito {
     } else {
       this.items[producto.id].cantidad++;
     }
+    this.guardarEnLocalStorage();
   }
 
   eliminarProducto(id) {
@@ -16,6 +43,7 @@ export class Carrito {
       this.items[id].cantidad--;
       if (this.items[id].cantidad <= 0) delete this.items[id];
     }
+    this.guardarEnLocalStorage();
   }
 
   obtenerLista() {
@@ -24,11 +52,17 @@ export class Carrito {
 
   vaciar() {
     this.items = {};
+    this.guardarEnLocalStorage();
   }
 
   total() {
     return this.obtenerLista()
       .reduce((sum, item) => sum + item.precio * item.cantidad, 0);
+  }
+
+  cantidadTotal() {
+    return this.obtenerLista()
+      .reduce((sum, item) => sum + item.cantidad, 0);
   }
 }
 

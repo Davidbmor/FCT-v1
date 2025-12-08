@@ -2,6 +2,7 @@
 import Header from "../components/Header.astro";
 import "../assets/css/style.css";
 import GestorTicketsIsland from "../components/islands/GestorTicketsIsland.jsx";
+import ChatCamareroIsland from "../components/islands/ChatCamareroIsland.jsx";
 ---
 
 <html lang="en">
@@ -155,7 +156,29 @@ import GestorTicketsIsland from "../components/islands/GestorTicketsIsland.jsx";
 
     <!-- Contenido protegido -->
     <div class="content-wrapper" id="contentWrapper">
-      <GestorTicketsIsland client:load />
+      <div class="gestor-tickets-section">
+        <h2 class="section-title">Pedidos Activos</h2>
+        <GestorTicketsIsland client:load />
+      </div>
+    </div>
+
+    <!-- Botón flotante para abrir chat -->
+    <button class="chat-toggle-btn" id="chatToggleBtn" title="Chat con clientes">
+      <i class="fas fa-comments"></i>
+      <span class="badge-chat-total" id="badgeChatTotal" style="display: none;">0</span>
+    </button>
+
+    <!-- Ventana flotante del chat -->
+    <div class="chat-camarero-floating" id="chatCamareroFloating">
+      <div class="chat-floating-body">
+        <div class="chat-floating-header">
+          <h3><i class="fas fa-comments"></i> Chat con Clientes</h3>
+          <button class="chat-close-btn" id="chatCloseBtn">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        <ChatCamareroIsland client:load />
+      </div>
     </div>
 
     <script>
@@ -238,6 +261,26 @@ import GestorTicketsIsland from "../components/islands/GestorTicketsIsland.jsx";
 
       // Enfocar el input al cargar
       passwordInput?.focus();
+
+      // Manejo del chat flotante
+      const chatToggleBtn = document.getElementById('chatToggleBtn');
+      const chatFloating = document.getElementById('chatCamareroFloating');
+      const chatCloseBtn = document.getElementById('chatCloseBtn');
+
+      chatToggleBtn?.addEventListener('click', () => {
+        chatFloating?.classList.add('active');
+      });
+
+      chatCloseBtn?.addEventListener('click', () => {
+        chatFloating?.classList.remove('active');
+      });
+
+      // Cerrar al hacer clic fuera del chat
+      chatFloating?.addEventListener('click', (e) => {
+        if (e.target === chatFloating) {
+          chatFloating.classList.remove('active');
+        }
+      });
     </script>
   </body>
 </html>

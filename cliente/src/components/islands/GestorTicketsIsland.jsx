@@ -5,69 +5,124 @@ import TicketStatusIsland from "../islands/TicketStatusIsland.jsx";
 
 export default function GestorTicketsIsland() {
   const [pedidos, setPedidos] = useState([]);
+  const [pedidosEliminados, setPedidosEliminados] = useState(new Set());
 
   useEffect(() => {
     socket.emit("obtenerPedidos");
 
-    socket.on("listaPedidos", (lista) => {
+    const handleListaPedidos = (lista) => {
       if (!Array.isArray(lista)) return;
-      setPedidos(lista);
-    });
+      // Filtrar los pedidos que ya fueron eliminados localmente
+      const pedidosFiltrados = lista.filter(p => !pedidosEliminados.has(p.id));
+      setPedidos(pedidosFiltrados);
+    };
 
-    socket.on("listaPedidos", (lista) => setPedidos(Array.isArray(lista) ? lista : []));
+    socket.on("listaPedidos", handleListaPedidos);
 
     return () => {
-      socket.off("listaPedidos");
+      socket.off("listaPedidos", handleListaPedidos);
     };
-  }, []);
+  }, [pedidosEliminados]);
 
   function cambiarEstado(id, nuevoEstado) {
     socket.emit("actualizarEstado", { id, nuevoEstado });
-    
-    setPedidos((prev) =>
-      prev.map((p) => (p.id === id ? { ...p, estado: nuevoEstado } : p))
-    );
   }
+
+  function eliminarPedido(id) {
+    socket.emit("eliminarPedido", { id });
+    // Marcar el pedido como eliminado localmente
+    setPedidosEliminados((prev) => new Set([...prev, id]));
+    setPedidos((prev) => prev.filter((p) => p.id !== id));
+  }
+
+  const calcularTotal = (items) => {
+    return items.reduce((total, item) => total + (item.precio * item.cantidad), 0).toFixed(2);
+  };
+
+  const getEstadoColor = (estado) => {
+    switch(estado) {
+      case 'en_espera': return { bg: '#FF781E', text: 'white' };
+      case 'en_preparacion': return { bg: '#FFE11F', text: '#1A1A1A' };
+      case 'terminado': return { bg: '#87c540', text: 'white' };
+      default: return { bg: '#999', text: 'white' };
+    }
+  };
 
   return (
     <section class="ticket-container">
       {pedidos.length === 0 ? (
-        <p>No hay pedidos en este momento.</p>
+        <div class="no-pedidos-message">
+          <i class="fa-solid fa-clipboard-list" style="font-size: 4rem; color: #ccc; margin-bottom: 15px;"></i>
+          <p style="font-size: 1.2rem; color: #666;">No hay pedidos en este momento</p>
+        </div>
       ) : (
         pedidos.map((pedido) => (
           <div class="ticket" key={pedido.id}>
-            <h2>
-              Ticket de la mesa <span class="id">{pedido.id}</span>
-            </h2>
+            <div class="ticket-header">
+              <div class="ticket-number">
+                <h2>Mesa {pedido.numeroMesa}</h2>
+                <span 
+                  class="ticket-badge"
+                  style={{
+                    backgroundColor: getEstadoColor(pedido.estado).bg,
+                    color: getEstadoColor(pedido.estado).text
+                  }}
+                >
+                  {pedido.estado === 'en_espera' ? 'En espera' : 
+                   pedido.estado === 'en_preparacion' ? 'En preparación' : 'Terminado'}
+                </span>
+              </div>
+              {pedido.estado === 'terminado' && (
+                <button 
+                  class="delete-ticket-btn"
+                  onClick={() => eliminarPedido(pedido.id)}
+                  title="Eliminar pedido"
+                >
+                  <i class="fa-solid fa-trash"></i>
+                </button>
+              )}
+            </div>
 
             <div class="ticket-items">
               <table>
                 <thead>
                   <tr>
-                    <th>Plato</th>
-                    <th>Cantidad</th>
+                    <th>Producto</th>
+                    <th>Cant.</th>
+                    <th>Precio</th>
                   </tr>
                 </thead>
                 <tbody>
                   {(pedido.items || []).map((it, idx) => (
-                
                     <tr key={it.id ?? idx}>
-                      <td>{it.nombre}</td>
-                      <td>{it.cantidad}</td>
+                      <td class="item-name">{it.nombre}</td>
+                      <td class="item-qty">{it.cantidad}</td>
+                      <td class="item-price">{it.precio}€</td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
 
+            <div class="ticket-total">
+              <strong>Total: {calcularTotal(pedido.items)}€</strong>
+            </div>
+
             <div class="ticket-status">
-             
-              {/* Le pasamos un handler para que use socket.emit */}
               <TicketStatusIsland
                 id={pedido.id}
                 estado={pedido.estado}
                 onChangeEstado={cambiarEstado}
               />
+            </div>
+
+            <div class="ticket-time">
+              <small style="color: #999;">
+                {new Date(pedido.fecha).toLocaleTimeString('es-ES', {
+                  hour: '2-digit',
+                  minute: '2-digit'
+                })}
+              </small>
             </div>
           </div>
         ))

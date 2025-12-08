@@ -1,4 +1,286 @@
 ---
-// Redirigir automáticamente a la carta
-return Astro.redirect('/carta');
+import "../assets/css/style.css";
 ---
+
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tori & Roll - Buffet Libre Japonés</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
+      crossorigin="anonymous"
+    />
+  </head>
+
+  <body class="home-body">
+    <!-- Hero Section -->
+    <section class="hero-section">
+      <div class="hero-overlay"></div>
+      <div class="hero-content">
+        <div class="logo-container">
+          <img src="/img/logo.png" alt="Tori & Roll Logo" class="hero-logo" />
+        </div>
+        <h1 class="hero-title">Bienvenido a Tori & Roll</h1>
+        <p class="hero-subtitle">Buffet Libre Japonés - Una experiencia única</p>
+        <a href="/carta" class="hero-cta" id="heroCta">
+          <span>Explorar Menú</span>
+          <i class="fas fa-arrow-right"></i>
+        </a>
+      </div>
+      <div class="scroll-indicator">
+        <i class="fas fa-chevron-down"></i>
+      </div>
+    </section>
+
+    <!-- Como Funciona Section -->
+    <section class="how-it-works">
+      <div class="container">
+        <h2 class="section-title">¿Cómo Funciona Nuestro Buffet?</h2>
+        <div class="steps-grid">
+          <div class="step-card">
+            <div class="step-icon">
+              <i class="fas fa-mobile-alt"></i>
+            </div>
+            <h3>1. Escanea el QR</h3>
+            <p>Accede a nuestra carta digital desde tu mesa con tu móvil</p>
+          </div>
+          
+          <div class="step-card">
+            <div class="step-icon">
+              <i class="fas fa-utensils"></i>
+            </div>
+            <h3>2. Elige tus Platos</h3>
+            <p>Selecciona hasta 10 productos por pedido de nuestra amplia variedad</p>
+          </div>
+          
+          <div class="step-card">
+            <div class="step-icon">
+              <i class="fas fa-clock"></i>
+            </div>
+            <h3>3. Espera 3 Minutos</h3>
+            <p>Entre pedido y pedido debe pasar un mínimo de 3 minutos</p>
+          </div>
+          
+          <div class="step-card">
+            <div class="step-icon">
+              <i class="fas fa-infinity"></i>
+            </div>
+            <h3>4. Come Sin Límite</h3>
+            <p>Disfruta de todos los platos que desees durante tu visita</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Pricing Section -->
+    <section class="pricing-section">
+      <div class="container">
+        <h2 class="section-title">Tarifas</h2>
+        <div class="pricing-grid">
+          <div class="pricing-card featured">
+            <div class="pricing-badge">Más Popular</div>
+            <div class="pricing-icon">
+              <i class="fas fa-user"></i>
+            </div>
+            <h3>Adultos</h3>
+            <div class="price">
+              <span class="currency">€</span>
+              <span class="amount">18.90</span>
+            </div>
+            <p class="price-description">Comida o Cena</p>
+            <ul class="features-list">
+              <li><i class="fas fa-check"></i> Buffet Libre</li>
+              <li><i class="fas fa-check"></i> Todos los platos</li>
+              <li><i class="fas fa-check"></i> Postres incluidos</li>
+            </ul>
+          </div>
+
+          <div class="pricing-card">
+            <div class="pricing-icon">
+              <i class="fas fa-child"></i>
+            </div>
+            <h3>Niños</h3>
+            <div class="price">
+              <span class="currency">€</span>
+              <span class="amount">9.90</span>
+            </div>
+            <p class="price-description">5-10 años</p>
+            <ul class="features-list">
+              <li><i class="fas fa-check"></i> Buffet Libre</li>
+              <li><i class="fas fa-check"></i> Menú infantil</li>
+              <li><i class="fas fa-check"></i> Postres incluidos</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="pricing-note">
+          <i class="fas fa-info-circle"></i>
+          <p><strong>Bebidas no incluidas:</strong> Las bebidas se cobran aparte según consumo</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features-section">
+      <div class="container">
+        <h2 class="section-title">¿Por Qué Elegirnos?</h2>
+        <div class="features-grid">
+          <div class="feature-item">
+            <i class="fas fa-fish"></i>
+            <h4>Ingredientes Frescos</h4>
+            <p>Pescado fresco diariamente y productos de primera calidad</p>
+          </div>
+          
+          <div class="feature-item">
+            <i class="fas fa-star"></i>
+            <h4>Cocina Auténtica</h4>
+            <p>Recetas tradicionales japonesas elaboradas por expertos</p>
+          </div>
+          
+          <div class="feature-item">
+            <i class="fas fa-mobile-screen"></i>
+            <h4>Pedidos Digitales</h4>
+            <p>Sistema moderno de pedidos desde tu mesa sin esperas</p>
+          </div>
+          
+          <div class="feature-item">
+            <i class="fas fa-leaf"></i>
+            <h4>Opciones Variadas</h4>
+            <p>Gran variedad de sushi, rolls, tempura, gyozas y más</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA Final -->
+    <section class="final-cta">
+      <div class="container">
+        <h2>¿Listo para disfrutar?</h2>
+        <p>Accede a nuestra carta digital y empieza a pedir</p>
+        <a href="/carta" class="cta-button" id="finalCta">
+          <span>Ver Carta Completa</span>
+          <i class="fas fa-arrow-right"></i>
+        </a>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="home-footer">
+      <div class="container">
+        <div class="footer-grid">
+          <div class="footer-column">
+            <div class="footer-logo">
+              <img src="/img/logo.png" alt="Tori & Roll" />
+              <p>Buffet Libre Japonés</p>
+            </div>
+            <p class="footer-description">
+              Disfruta de la auténtica cocina japonesa con nuestro sistema de buffet libre.
+              Ingredientes frescos, calidad superior y una experiencia única.
+            </p>
+          </div>
+
+          <div class="footer-column">
+            <h4><i class="fas fa-map-marker-alt"></i> Ubicación</h4>
+            <p>Calle Ejemplo, 123</p>
+            <p>28001 Madrid, España</p>
+            <a href="#" class="footer-link">
+              <i class="fas fa-directions"></i> Cómo llegar
+            </a>
+          </div>
+
+          <div class="footer-column">
+            <h4><i class="fas fa-clock"></i> Horarios</h4>
+            <div class="schedule">
+              <p><strong>Comidas:</strong> 12:00 - 16:00</p>
+              <p><strong>Cenas:</strong> 20:00 - 23:30</p>
+              <p class="schedule-note">Abierto todos los días</p>
+            </div>
+          </div>
+
+          <div class="footer-column">
+            <h4><i class="fas fa-phone"></i> Contacto</h4>
+            <p><i class="fas fa-phone"></i> +34 912 345 678</p>
+            <p><i class="fas fa-envelope"></i> info@toriandroll.com</p>
+            <div class="social-links">
+              <a href="#" title="Facebook"><i class="fab fa-facebook"></i></a>
+              <a href="#" title="Instagram"><i class="fab fa-instagram"></i></a>
+              <a href="#" title="TripAdvisor"><i class="fab fa-tripadvisor"></i></a>
+            </div>
+          </div>
+        </div>
+
+        <div class="footer-bottom">
+          <p>&copy; 2025 Tori & Roll. Todos los derechos reservados.</p>
+          <div class="footer-links">
+            <a href="#">Política de Privacidad</a>
+            <span>•</span>
+            <a href="#">Términos y Condiciones</a>
+            <span>•</span>
+            <a href="#">Aviso Legal</a>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <script>
+      // Scroll suave para el indicador
+      document.querySelector('.scroll-indicator')?.addEventListener('click', () => {
+        document.querySelector('.how-it-works')?.scrollIntoView({ behavior: 'smooth' });
+      });
+
+      // Animación al scroll
+      const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+      };
+
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('animate-in');
+          }
+        });
+      }, observerOptions);
+
+      document.querySelectorAll('.step-card, .pricing-card, .feature-item').forEach(el => {
+        observer.observe(el);
+      });
+
+      // Animación épica para los botones CTA
+      function createEpicTransition(e) {
+        e.preventDefault();
+        const button = e.currentTarget;
+        const targetUrl = button.href;
+        
+        // Crear overlay de transición
+        const overlay = document.createElement('div');
+        overlay.className = 'page-transition-overlay';
+        document.body.appendChild(overlay);
+        
+        // Crear efecto de ripple desde el botón
+        const ripple = document.createElement('div');
+        ripple.className = 'transition-ripple';
+        const rect = button.getBoundingClientRect();
+        ripple.style.left = rect.left + rect.width / 2 + 'px';
+        ripple.style.top = rect.top + rect.height / 2 + 'px';
+        document.body.appendChild(ripple);
+        
+        // Añadir clase de animación
+        requestAnimationFrame(() => {
+          overlay.classList.add('active');
+          ripple.classList.add('active');
+        });
+        
+        // Redirigir después de la animación
+        setTimeout(() => {
+          window.location.href = targetUrl;
+        }, 800);
+      }
+
+      document.getElementById('heroCta')?.addEventListener('click', createEpicTransition);
+      document.getElementById('finalCta')?.addEventListener('click', createEpicTransition);
+    </script>
+  </body>
+</html>

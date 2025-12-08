@@ -1,15 +1,15 @@
 ---
-import ClientOrder from "./ClientOrder.astro";
+import ClientOrdersIsland from "./islands/ClientOrdersIsland.jsx";
 ---
 
 <section class="ClientOrderGestor">
-    <div class="ClientOrderContainer">
-        <ClientOrder />
+    <div class="ClientOrderHeader">
+        <div class="cross close">
+            <span class="close"></span>
+            <span class="close"></span>
+        </div>
     </div>
-</section>
-
-<section class="ClientOrderGestor">
     <div class="ClientOrderContainer">
-        
+        <ClientOrdersIsland client:load />
     </div>
 </section>

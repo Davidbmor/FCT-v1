@@ -8,9 +8,9 @@ export default function TicketStatusIsland({ id, estado }) {
 
   return (
     <select class="estado-selector" onChange={cambiar} value={estado}>
-      <option value="wait" data-color="#e31f26">En espera</option>
-      <option value="prep" data-color="#f8ed43">En preparación</option>
-      <option value="end" data-color="#87c540">Terminado</option>
+      <option value="en_espera" data-color="#FF781E">En espera</option>
+      <option value="en_preparacion" data-color="#FFE11F">En preparación</option>
+      <option value="terminado" data-color="#87c540">Terminado</option>
     </select>
   );
 }

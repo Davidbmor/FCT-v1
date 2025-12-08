@@ -5,10 +5,20 @@ import Cart from "../components/Cart.astro";
 import { obtenerProductos } from "../lib/api.js";
 import "../assets/css/style.css";
 import OptionLeftNav from "../components/OptionLeftNav.astro";
-import MenuSection from "../components/MenuSection.astro";
 import ClientOrderGestor from "../components/ClientOrderGestor.astro";
 import ProductDesc from "../components/ProductDesc.astro";
+import ChatGestor from "../components/ChatGestor.astro";
+
 const productos = await obtenerProductos();
+
+// Obtener categorías únicas de los productos
+const categorias = [...new Set(productos.map((p: any) => p.tipo))].filter(Boolean);
+
+// Agrupar productos por categoría
+const productosPorCategoria = categorias.reduce((acc: any, categoria: string) => {
+  acc[categoria] = productos.filter((p: any) => p.tipo === categoria);
+  return acc;
+}, {});
 ---
 
 <html lang="es">
@@ -26,24 +36,52 @@ const productos = await obtenerProductos();
   <body>
     <Header />
 
+    <button class="sidebar-toggle sidebar-open" id="sidebarToggle">
+      <i class="fas fa-times"></i>
+    </button>
+
     <div class="flexible">
-      <section class="left-nav">
+      <section class="left-nav" id="leftNav">
         <ul>
-          <li class="selector"><a class="selector" href="">SUSHIS</a></li>
-          <OptionLeftNav idReference="Sushi" name="sushis" />
-          <OptionLeftNav idReference="Carnes" name="Carnes" />
+          {categorias.map((categoria: string) => (
+            <OptionLeftNav 
+              idReference={categoria.toLowerCase().replace(/\s+/g, '-')} 
+              name={categoria} 
+            />
+          ))}
         </ul>
       </section>
 
       <section class="menu-view">
-        <MenuSection section="Sushi" idReference="Sushi"></MenuSection>
-        <MenuSection section="Carne" idReference="Carnes"></MenuSection>
+        {categorias.map((categoria: string) => {
+          const idCategoria = categoria.toLowerCase().replace(/\s+/g, '-');
+          const productosCategoria = productosPorCategoria[categoria];
+          
+          return (
+            <div class="menu-section-container" id={idCategoria}>
+              <h1 class="tittle-menu-section">{categoria}</h1>
+              <div class="plate-cards-container">
+                {productosCategoria.map((p: any) => (
+                  <PlateCard
+                    name={p.nombre}
+                    amount={p.cantidad ?? 1}
+                    img={p.url_imagen ? `http://localhost:3000${p.url_imagen}` : "/src/assets/img/sushi.webp"}
+                    productId={p.id}
+                    producto={p}
+                  />
+                ))}
+              </div>
+            </div>
+          );
+        })}
       </section>
     </div>
 
     <Cart />
 
     <ClientOrderGestor />
+
+    <ChatGestor />
 
     <ProductDesc name="" description="" />
 
@@ -70,7 +108,33 @@ const productos = await obtenerProductos();
           </g>
         </svg>
       </div>
+      <div class="ChatIcon">
+        <i class="fa-solid fa-comments"></i>
+      </div>
     </footer>
     <script src="../assets/js/index.js"></script>
+    <script src="../assets/js/categoryNav.js"></script>
+    <script src="../assets/js/cartCounter.js"></script>
+    <script>
+      const sidebarToggle = document.getElementById('sidebarToggle');
+      const leftNav = document.getElementById('leftNav');
+      const menuView = document.querySelector('.menu-view');
+
+      sidebarToggle.addEventListener('click', () => {
+        leftNav.classList.toggle('closed');
+        menuView.classList.toggle('expanded');
+        sidebarToggle.classList.toggle('sidebar-open');
+        
+        // Cambiar icono: X cuando cerrado, barras cuando abierto
+        const icon = sidebarToggle.querySelector('i');
+        if (leftNav.classList.contains('closed')) {
+          icon.classList.remove('fa-times');
+          icon.classList.add('fa-bars');
+        } else {
+          icon.classList.remove('fa-bars');
+          icon.classList.add('fa-times');
+        }
+      });
+    </script>
   </body>
 </html>

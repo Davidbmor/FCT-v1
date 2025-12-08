@@ -44,23 +44,60 @@ app.use(createUsuarioRoutes(usuarioController));
 interface Pedido {
   id: string;
   socketId: string;
+  numeroMesa: number;
   items: any[];
   estado: string;
   fecha: string;
 }
 
 const pedidos: Record<string, Pedido> = {};
+const socketToMesa: Record<string, number> = {};
+const sessionToMesa: Record<string, number> = {};
+const mesaToSocket: Record<number, string> = {};
+const empleadosSockets: Set<string> = new Set();
+let contadorMesas = 0;
 
 io.on("connection", (socket) => {
-  console.log("🟢 Cliente conectado:", socket.id);
+  const esEmpleado = socket.handshake.auth?.esEmpleado || false;
+  const sessionId = socket.handshake.auth?.sessionId;
+  
+  // Solo asignar número de mesa si NO es empleado
+  if (!esEmpleado) {
+    let numeroMesa: number;
+    
+    // Si ya existe una sesión, reutilizar el número de mesa
+    if (sessionId && sessionToMesa[sessionId]) {
+      numeroMesa = sessionToMesa[sessionId];
+      console.log(`🔄 Cliente reconectado: ${socket.id} - Mesa ${numeroMesa} (sesión: ${sessionId})`);
+    } else {
+      // Nueva sesión, asignar nuevo número de mesa
+      contadorMesas++;
+      numeroMesa = contadorMesas;
+      if (sessionId) {
+        sessionToMesa[sessionId] = numeroMesa;
+      }
+      console.log(`🟢 Cliente conectado: ${socket.id} - Mesa ${numeroMesa}`);
+    }
+    
+    socketToMesa[socket.id] = numeroMesa;
+    mesaToSocket[numeroMesa] = socket.id;
+    
+    // Enviar número de mesa al cliente
+    socket.emit("asignarMesa", { numeroMesa });
+  } else {
+    empleadosSockets.add(socket.id);
+    console.log(`🟢 Empleado conectado: ${socket.id}`);
+  }
 
-  socket.on("nuevoPedido", (pedido) => {
+  socket.on("nuevoPedido", (pedido, callback) => {
     const id = randomUUID();
+    const numeroMesa = socketToMesa[socket.id] || 0;
     const nuevoPedido: Pedido = {
       id,
       socketId: socket.id,
+      numeroMesa,
       items: pedido.items,
-      estado: "recibido",
+      estado: "en_espera",
       fecha: new Date().toISOString(),
     };
 
@@ -71,6 +108,11 @@ io.on("connection", (socket) => {
     io.emit("listaPedidos", Object.values(pedidos));
 
     console.log(`🧾 Pedido nuevo ${id} recibido de ${socket.id}`);
+    
+    // Enviar respuesta al cliente con el ID del pedido
+    if (callback) {
+      callback({ id, estado: 'en_espera' });
+    }
   });
 
   socket.on("actualizarEstado", ({ id, nuevoEstado }) => {
@@ -86,12 +128,50 @@ io.on("connection", (socket) => {
     console.log(`📦 Pedido ${id} actualizado a "${nuevoEstado}"`);
   });
 
+  socket.on("eliminarPedido", ({ id }) => {
+    const pedido = pedidos[id];
+    if (!pedido) return;
+
+    delete pedidos[id];
+
+    io.emit("listaPedidos", Object.values(pedidos));
+
+    console.log(`🗑️ Pedido ${id} eliminado`);
+  });
+
   socket.on("obtenerPedidos", () => {
     socket.emit("listaPedidos", Object.values(pedidos));
   });
 
+  socket.on("enviarMensajeChat", (mensaje) => {
+    console.log(`💬 Mensaje de ${mensaje.remitente} - Mesa ${mensaje.numeroMesa}: ${mensaje.texto}`);
+    
+    if (mensaje.remitente === "cliente") {
+      // Mensaje del cliente -> enviar solo a todos los empleados
+      empleadosSockets.forEach(empleadoSocket => {
+        io.to(empleadoSocket).emit("nuevoMensajeChat", mensaje);
+      });
+    } else if (mensaje.remitente === "camarero") {
+      // Mensaje del camarero -> enviar solo a la mesa específica
+      const socketMesa = mesaToSocket[mensaje.numeroMesa];
+      if (socketMesa) {
+        io.to(socketMesa).emit("nuevoMensajeChat", mensaje);
+      }
+    }
+  });
+
   socket.on("disconnect", () => {
-    console.log(`🔴 Cliente desconectado: ${socket.id}`);
+    const numeroMesa = socketToMesa[socket.id];
+    if (numeroMesa) {
+      console.log(`🔴 Cliente desconectado: ${socket.id} - Mesa ${numeroMesa}`);
+      delete socketToMesa[socket.id];
+      delete mesaToSocket[numeroMesa];
+    }
+    
+    if (empleadosSockets.has(socket.id)) {
+      console.log(`🔴 Empleado desconectado: ${socket.id}`);
+      empleadosSockets.delete(socket.id);
+    }
   });
 });
 

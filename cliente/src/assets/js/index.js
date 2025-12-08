@@ -15,7 +15,7 @@ addEventListener("DOMContentLoaded", (event) => {
     })
 
 
-    document.querySelector("footer").addEventListener("click", (e) => {
+    document.querySelector(".ClientOrderIcon").addEventListener("click", (e) => {
         let ClientOrder = document.querySelector(".ClientOrderGestor")
         console.log(ClientOrder);
         const style = window.getComputedStyle(ClientOrder);
@@ -25,8 +25,17 @@ addEventListener("DOMContentLoaded", (event) => {
         } else {
             ClientOrder.style.display = 'block';
         }
+    })
 
+    document.querySelector(".ChatIcon").addEventListener("click", (e) => {
+        let ChatGestor = document.querySelector(".ChatGestor")
+        const style = window.getComputedStyle(ChatGestor);
 
+        if (style.display == "block") {
+            ChatGestor.style.display = 'none';
+        } else {
+            ChatGestor.style.display = 'block';
+        }
     })
 
 
@@ -43,6 +52,10 @@ addEventListener("DOMContentLoaded", (event) => {
                     let ClientOrder = document.querySelector(".ClientOrderGestor")
                     ClientOrder.style.display = 'none';
                 }
+                if (truecross.parentElement.classList.contains("ChatHeader")) {
+                    let ChatGestor = document.querySelector(".ChatGestor")
+                    ChatGestor.style.display = 'none';
+                }
             } else {
                 if (e.target.parentElement.classList.contains("Carrito-header")) {
 
@@ -52,6 +65,10 @@ addEventListener("DOMContentLoaded", (event) => {
                 if (e.target.parentElement.classList.contains("ClientOrderHeader")) {
                     let ClientOrder = document.querySelector(".ClientOrderGestor")
                     ClientOrder.style.display = 'none';
+                }
+                if (e.target.parentElement.classList.contains("ChatHeader")) {
+                    let ChatGestor = document.querySelector(".ChatGestor")
+                    ChatGestor.style.display = 'none';
                 }
             }
         }
