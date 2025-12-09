@@ -8,15 +8,12 @@ export default function ChatCamareroIsland() {
   const mensajesEndRef = useRef(null);
 
   useEffect(() => {
-    // Cargar mensajes desde localStorage
     const mensajesGuardados = localStorage.getItem('chat_camarero');
     if (mensajesGuardados) {
       setMensajesPorMesa(JSON.parse(mensajesGuardados));
     }
 
-    // Escuchar mensajes nuevos (solo del cliente)
     const handleNuevoMensaje = (mensaje) => {
-      // Solo agregar mensajes del cliente, no los propios del camarero
       if (mensaje.remitente !== 'camarero') {
         setMensajesPorMesa((prev) => {
           const mesaKey = mensaje.numeroMesa;
@@ -29,7 +26,6 @@ export default function ChatCamareroIsland() {
           return nuevos;
         });
 
-        // Auto-seleccionar la mesa si hay un mensaje nuevo
         if (!mesaSeleccionada) {
           setMesaSeleccionada(mensaje.numeroMesa);
         }
@@ -116,7 +112,6 @@ export default function ChatCamareroIsland() {
     });
   };
 
-  // Actualizar badge del botón flotante
   useEffect(() => {
     const totalNoLeidos = contarTotalNoLeidos();
     const badge = document.getElementById('badgeChatTotal');

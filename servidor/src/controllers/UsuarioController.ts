@@ -8,6 +8,10 @@ export class UsuarioController {
     this.usuarioModel = usuarioModel;
   }
 
+  /**
+   * Autentica usuarios según su rol (cliente, gestor, camarero)
+   * Los clientes no requieren contraseña, otros roles sí
+   */
   login = async (req: Request, res: Response) => {
     try {
       const { nombre_usuario, contrasena, rol } = req.body;

@@ -33,11 +33,10 @@ export default function CartIsland() {
   useEffect(() => {
     window.addEventListener("cart-updated", refresh);
     
-    // Verificar si hay un tiempo de espera activo
     const ultimoPedidoTime = localStorage.getItem('ultimoPedidoTime');
     if (ultimoPedidoTime) {
       const tiempoTranscurrido = Date.now() - parseInt(ultimoPedidoTime);
-      const tiempoEspera = 3 * 60 * 1000; // 3 minutos en milisegundos
+      const tiempoEspera = 3 * 60 * 1000;
       
       if (tiempoTranscurrido < tiempoEspera) {
         const restante = Math.ceil((tiempoEspera - tiempoTranscurrido) / 1000);
@@ -64,8 +63,11 @@ export default function CartIsland() {
     }
   }, [tiempoRestante]);
 
+  /**
+   * Valida y envía el pedido al servidor
+   * Verifica límite de 10 productos y tiempo de espera de 3 minutos entre pedidos
+   */
   function enviarPedido() {
-    // Validar máximo 10 productos
     const cantidadTotal = carritoGlobal.cantidadTotal();
     if (cantidadTotal > 10) {
       setMensajeError("No puedes pedir más de 10 productos por pedido");
@@ -73,7 +75,6 @@ export default function CartIsland() {
       return;
     }
 
-    // Validar tiempo de espera
     if (tiempoRestante > 0) {
       setMensajeError(`Debes esperar ${formatTime(tiempoRestante)} antes de hacer otro pedido`);
       setTimeout(() => setMensajeError(""), 4000);
@@ -83,29 +84,22 @@ export default function CartIsland() {
     const pedido = { items };
     socket.emit("nuevoPedido", pedido, (response) => {
       if (response && response.id) {
-        // Agregar el pedido al historial con el ID del servidor
         historial.actualizarPedido({
           id: response.id,
           items: items,
           estado: 'en_espera'
         });
         
-        // Guardar timestamp del pedido
         localStorage.setItem('ultimoPedidoTime', Date.now().toString());
-        setTiempoRestante(3 * 60); // 3 minutos
+        setTiempoRestante(3 * 60);
       }
     });
     
     carritoGlobal.vaciar();
     refresh();
-    
-    // Actualizar el contador del carrito
     window.dispatchEvent(new CustomEvent("cart-updated"));
     
-    // Mostrar mensaje de confirmación
     setPedidoEnviado(true);
-    
-    // Ocultar mensaje después de 3 segundos
     setTimeout(() => {
       setPedidoEnviado(false);
     }, 3000);

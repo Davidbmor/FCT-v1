@@ -1,6 +1,5 @@
 import { io } from "socket.io-client";
 
-// Detectar si es empleado basándose en la URL
 const esEmpleado = () => {
   if (typeof window !== 'undefined') {
     const path = window.location.pathname;
@@ -9,7 +8,10 @@ const esEmpleado = () => {
   return false;
 };
 
-// Obtener o generar ID de sesión único para el cliente
+/**
+ * Genera o recupera un ID de sesión único para identificar al cliente
+ * Persiste en localStorage para mantener la sesión entre recargas
+ */
 const getClientSessionId = () => {
   if (typeof window === 'undefined') return null;
   
@@ -31,10 +33,8 @@ export const socket = io("http://localhost:3000", {
   reconnectionAttempts: 10
 });
 
-// Variable global para almacenar el número de mesa
 let numeroMesa = null;
 
-// Intentar cargar número de mesa desde localStorage
 if (typeof window !== 'undefined' && !esEmpleado()) {
   const mesaGuardada = localStorage.getItem('numeroMesa');
   if (mesaGuardada) {
@@ -59,17 +59,18 @@ socket.on("disconnect", (reason) => {
   console.log("🔴 Desconectado del servidor:", reason);
 });
 
-// Función para cerrar sesión y permitir nueva asignación de mesa
+/**
+ * Cierra la sesión del cliente limpiando todo el estado local
+ * y forzando la reasignación de mesa en la próxima conexión
+ */
 export const cerrarSesionCliente = () => {
   if (typeof window === 'undefined') return;
   
-  // Limpiar localStorage
   localStorage.removeItem('clientSessionId');
   localStorage.removeItem('numeroMesa');
   localStorage.removeItem('carrito');
   localStorage.removeItem('historialPedidos');
   
-  // Limpiar chats
   const keys = Object.keys(localStorage);
   keys.forEach(key => {
     if (key.startsWith('chat_')) {
@@ -77,7 +78,6 @@ export const cerrarSesionCliente = () => {
     }
   });
   
-  // Recargar la página para obtener nueva sesión
   window.location.reload();
 };
 

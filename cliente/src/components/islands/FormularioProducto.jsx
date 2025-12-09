@@ -13,10 +13,12 @@ export default function FormularioProducto() {
     descripcion: '',
     url_imagen: '',
     precio: '',
+    cantidad: '',
     alergenos: []
   });
 
   const [previewImg, setPreviewImg] = useState(null);
+  const [modalMensaje, setModalMensaje] = useState({ visible: false, tipo: '', mensaje: '' });
 
   useEffect(() => {
     cargarAlergenos();
@@ -31,6 +33,7 @@ export default function FormularioProducto() {
         descripcion: producto.descripcion || '',
         url_imagen: producto.url_imagen || '',
         precio: producto.precio.toString(),
+        cantidad: producto.cantidad ? producto.cantidad.toString() : '1',
         alergenos: producto.alergenos 
           ? producto.alergenos.map(a => a.id)
           : []
@@ -62,6 +65,9 @@ export default function FormularioProducto() {
     }
   };
 
+  /**
+   * Convierte imagen seleccionada a base64 para preview y envío
+   */
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -96,12 +102,17 @@ export default function FormularioProducto() {
     }));
   };
 
+  /**
+   * Envía el formulario de producto (crear o actualizar)
+   * Gestiona conversión de tipos y manejo de imágenes base64
+   */
   const handleSubmit = async (e) => {
     e.preventDefault();
     
     const datosEnviar = editando ? {} : {
       ...formData,
-      precio: parseFloat(formData.precio)
+      precio: parseFloat(formData.precio),
+      cantidad: parseInt(formData.cantidad) || 1
     };
 
     if (editando) {
@@ -112,6 +123,7 @@ export default function FormularioProducto() {
         datosEnviar.url_imagen = formData.url_imagen;
       }
       if (formData.precio) datosEnviar.precio = parseFloat(formData.precio);
+      if (formData.cantidad) datosEnviar.cantidad = parseInt(formData.cantidad);
       datosEnviar.alergenos = formData.alergenos;
     }
     
@@ -129,18 +141,33 @@ export default function FormularioProducto() {
       });
 
       if (res.ok) {
-        alert(editando ? 'Producto actualizado' : 'Producto añadido');
-        limpiarForm();
-        if (window.recargarProductosGlobal) {
-          window.recargarProductosGlobal();
-        }
+        setModalMensaje({
+          visible: true,
+          tipo: 'success',
+          mensaje: editando ? 'Producto actualizado correctamente' : 'Producto añadido correctamente'
+        });
+        setTimeout(() => {
+          limpiarForm();
+          setModalMensaje({ visible: false, tipo: '', mensaje: '' });
+          if (window.recargarProductosGlobal) {
+            window.recargarProductosGlobal();
+          }
+        }, 1500);
       } else {
         const errorData = await res.json().catch(() => ({}));
-        alert(`Error: ${errorData.error || res.statusText}`);
+        setModalMensaje({
+          visible: true,
+          tipo: 'error',
+          mensaje: errorData.error || res.statusText
+        });
       }
     } catch (err) {
       console.error('Error:', err);
-      alert(`Error de conexión: ${err.message}`);
+      setModalMensaje({
+        visible: true,
+        tipo: 'error',
+        mensaje: `Error de conexión: ${err.message}`
+      });
     }
   };
 
@@ -151,6 +178,7 @@ export default function FormularioProducto() {
       descripcion: '',
       url_imagen: '',
       precio: '',
+      cantidad: '',
       alergenos: []
     });
     setPreviewImg(null);
@@ -251,6 +279,18 @@ export default function FormularioProducto() {
             required={!editando}
           />
         </div>
+
+        <div class="form-group">
+          <label>Cantidad</label>
+          <input 
+            type="number" 
+            value={formData.cantidad}
+            min="1"
+            placeholder="1"
+            onInput={(e) => setFormData({ ...formData, cantidad: e.target.value })}
+            required={!editando}
+          />
+        </div>
             <br></br>
         <div style={{ display: 'flex', gap: '10px' }}>
           <button type="submit" class="btn-save">
@@ -267,6 +307,32 @@ export default function FormularioProducto() {
           )}
         </div>
       </form>
+
+      {modalMensaje.visible && (
+        <div class="modal-gestor-overlay" onClick={() => setModalMensaje({ visible: false, tipo: '', mensaje: '' })}>
+          <div class="modal-gestor-content" onClick={(e) => e.stopPropagation()}>
+            <div class={`modal-gestor-icon ${modalMensaje.tipo}`}>
+              {modalMensaje.tipo === 'success' ? (
+                <i class="fa-solid fa-circle-check"></i>
+              ) : (
+                <i class="fa-solid fa-circle-xmark"></i>
+              )}
+            </div>
+            <h3 class="modal-gestor-title">
+              {modalMensaje.tipo === 'success' ? '¡Éxito!' : 'Error'}
+            </h3>
+            <p class="modal-gestor-mensaje">{modalMensaje.mensaje}</p>
+            {modalMensaje.tipo === 'error' && (
+              <button 
+                class="btn-modal-confirmar" 
+                onClick={() => setModalMensaje({ visible: false, tipo: '', mensaje: '' })}
+              >
+                Cerrar
+              </button>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

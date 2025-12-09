@@ -10,6 +10,7 @@ import "../assets/css/style.css";
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Tori & Roll - Gestor de Carta</title>
+    <link rel="icon" type="image/png" href="/img/logo.png" />
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
@@ -154,7 +155,6 @@ import "../assets/css/style.css";
       </div>
     </div>
 
-    <!-- Contenido protegido -->
     <div class="content-wrapper" id="contentWrapper">
       <FormularioProducto client:load />
 
@@ -175,19 +175,16 @@ import "../assets/css/style.css";
       const errorMessage = document.getElementById("errorMessage");
       const contentWrapper = document.getElementById("contentWrapper");
 
-      // Verificar si ya está autenticado
       const userRole = sessionStorage.getItem("userRole");
       if (userRole === "administrador") {
         authModal?.classList.remove("active");
         contentWrapper?.classList.add("unlocked");
       }
 
-      // Cancelar y volver a la carta
       btnCancel?.addEventListener("click", () => {
         window.location.href = "/carta";
       });
 
-      // Validar contraseña
       btnSubmit?.addEventListener("click", validatePassword);
       passwordInput?.addEventListener("keypress", (e) => {
         if (e.key === "Enter") {
@@ -220,16 +217,13 @@ import "../assets/css/style.css";
           const data = await response.json();
 
           if (data.success) {
-            // Guardar sesión
             sessionStorage.setItem("userRole", data.usuario.rol);
             sessionStorage.setItem("userId", data.usuario.id);
             sessionStorage.setItem("userName", data.usuario.nombre_usuario);
             
-            // Ocultar modal y mostrar contenido
             authModal?.classList.remove("active");
             contentWrapper?.classList.add("unlocked");
           } else {
-            // Mostrar error
             errorMessage?.classList.add("show");
             if (errorMessage) errorMessage.textContent = "Contraseña incorrecta";
             if (passwordInput) passwordInput.value = "";
@@ -244,7 +238,6 @@ import "../assets/css/style.css";
         }
       }
 
-      // Enfocar el input al cargar
       passwordInput?.focus();
     </script>
   </body>

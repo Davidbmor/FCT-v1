@@ -8,24 +8,20 @@ export default function ChatIsland() {
   const mensajesEndRef = useRef(null);
 
   useEffect(() => {
-    // Obtener número de mesa
     const mesa = obtenerNumeroMesa();
     setNumeroMesa(mesa);
 
-    // Escuchar asignación de mesa
     const handleAsignarMesa = ({ numeroMesa: mesa }) => {
       setNumeroMesa(mesa);
     };
 
     socket.on("asignarMesa", handleAsignarMesa);
 
-    // Cargar mensajes desde localStorage
     const mensajesGuardados = localStorage.getItem(`chat_mesa_${mesa}`);
     if (mensajesGuardados) {
       setMensajes(JSON.parse(mensajesGuardados));
     }
 
-    // Escuchar mensajes nuevos
     const handleNuevoMensaje = (mensaje) => {
       setMensajes((prev) => {
         const nuevos = [...prev, mensaje];
@@ -43,7 +39,6 @@ export default function ChatIsland() {
   }, [numeroMesa]);
 
   useEffect(() => {
-    // Scroll automático al último mensaje
     mensajesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [mensajes]);
 

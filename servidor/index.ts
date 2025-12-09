@@ -23,6 +23,7 @@ app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
 app.use('/imagenes', express.static('imagenes'));
+app.use('/alergenos', express.static('alergenos'));
 
 const httpServer = createServer(app);
 const io = new Server(httpServer, { cors: { origin: "*" } });
@@ -57,11 +58,14 @@ const mesaToSocket: Record<number, string> = {};
 const empleadosSockets: Set<string> = new Set();
 let contadorMesas = 0;
 
+/**
+ * Gestiona conexiones WebSocket para clientes y empleados
+ * Asigna mesas a clientes y mantiene sesiones persistentes
+ */
 io.on("connection", (socket) => {
   const esEmpleado = socket.handshake.auth?.esEmpleado || false;
   const sessionId = socket.handshake.auth?.sessionId;
   
-  // Solo asignar número de mesa si NO es empleado
   if (!esEmpleado) {
     let numeroMesa: number;
     
@@ -89,6 +93,10 @@ io.on("connection", (socket) => {
     console.log(`🟢 Empleado conectado: ${socket.id}`);
   }
 
+  /**
+   * Procesa nuevos pedidos de clientes
+   * Asigna ID único, almacena pedido y notifica a empleados
+   */
   socket.on("nuevoPedido", (pedido, callback) => {
     const id = randomUUID();
     const numeroMesa = socketToMesa[socket.id] || 0;
@@ -115,6 +123,9 @@ io.on("connection", (socket) => {
     }
   });
 
+  /**
+   * Actualiza el estado de un pedido y notifica al cliente y empleados
+   */
   socket.on("actualizarEstado", ({ id, nuevoEstado }) => {
     const pedido = pedidos[id];
     if (!pedido) return;

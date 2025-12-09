@@ -7,28 +7,29 @@ export default function ClientOrdersIsland() {
   const [numeroMesa, setNumeroMesa] = useState(null);
   const [modalPagoAbierto, setModalPagoAbierto] = useState(false);
   const [pedidoSeleccionado, setPedidoSeleccionado] = useState(null);
+  const [modalConfirmacionAbierto, setModalConfirmacionAbierto] = useState(false);
+  const [tipoPago, setTipoPago] = useState(null);
+  const [pantallaPagoAbierta, setPantallaPagoAbierta] = useState(false);
+  const [metodoPagoSeleccionado, setMetodoPagoSeleccionado] = useState(null);
+  const [procesandoPago, setProcesandoPago] = useState(false);
 
   useEffect(() => {
-    // Obtener número de mesa
     const mesa = obtenerNumeroMesa();
     if (mesa) {
       setNumeroMesa(mesa);
     }
 
-    // Escuchar asignación de mesa
     const handleAsignarMesa = ({ numeroMesa: mesa }) => {
       setNumeroMesa(mesa);
     };
 
     socket.on("asignarMesa", handleAsignarMesa);
 
-    // Escuchar cuando se recibe el estado de un pedido
     socket.on("estadoPedido", (pedido) => {
       historial.actualizarPedido(pedido);
       setPedidos([...historial.obtenerHistorial()]);
     });
 
-    // Cargar el historial al montar el componente
     setPedidos(historial.obtenerHistorial());
 
     return () => {
@@ -72,21 +73,38 @@ export default function ClientOrdersIsland() {
   const pagarConMetodo = (metodo) => {
     if (!numeroMesa) return;
 
+    // Abrir pantalla de pago específica
+    setMetodoPagoSeleccionado(metodo);
+    cerrarModalPago();
+    setPantallaPagoAbierta(true);
+  };
+
+  /**
+   * Envía solicitud de pago al camarero con el método seleccionado
+   */
+  const confirmarPago = () => {
+    setProcesandoPago(true);
+
     const totalGeneral = calcularTotalGeneral();
     const numPedidos = pedidos.length;
 
-    // Enviar notificación al camarero
     socket.emit("mensajeCliente", {
       numeroMesa,
-      mensaje: `💳 Solicitud de pago con ${metodo} - ${numPedidos} pedido(s) - Total: ${totalGeneral}€`,
+      mensaje: `💳 Solicitud de pago con ${metodoPagoSeleccionado} - ${numPedidos} pedido(s) - Total: ${totalGeneral}€`,
       remitente: "cliente"
     });
 
-    alert(`Pago con ${metodo} realizado. Gracias por su visita.`);
-    cerrarModalPago();
-    
-    // Cerrar sesión después del pago
-    cerrarSesionCliente();
+    setTimeout(() => {
+      setProcesandoPago(false);
+      setPantallaPagoAbierta(false);
+      setTipoPago(metodoPagoSeleccionado);
+      setModalConfirmacionAbierto(true);
+    }, 2000);
+  };
+
+  const cerrarPantallaPago = () => {
+    setPantallaPagoAbierta(false);
+    setMetodoPagoSeleccionado(null);
   };
 
   const solicitarTicket = () => {
@@ -102,22 +120,20 @@ export default function ClientOrdersIsland() {
       remitente: "cliente"
     });
 
-    alert("Solicitud de ticket enviada. Gracias por su visita.");
+    // Guardar tipo como ticket y abrir modal de confirmación
+    setTipoPago("ticket");
     cerrarModalPago();
-    
-    // Cerrar sesión después de solicitar ticket
-    cerrarSesionCliente();
+    setModalConfirmacionAbierto(true);
   };
 
   const cerrarSesionCliente = () => {
-    // Limpiar localStorage
     localStorage.removeItem('clientSessionId');
     localStorage.removeItem('numeroMesa');
     localStorage.removeItem('carrito');
     localStorage.removeItem('historialPedidos');
     localStorage.removeItem('comensales');
+    localStorage.removeItem('ultimoPedidoTime');
     
-    // Limpiar chats
     const keys = Object.keys(localStorage);
     keys.forEach(key => {
       if (key.startsWith('chat_')) {
@@ -125,18 +141,19 @@ export default function ClientOrdersIsland() {
       }
     });
     
-    // Redirigir a la página de inicio
     setTimeout(() => {
       window.location.href = '/';
     }, 1500);
   };
 
+  /**
+   * Calcula el total general incluyendo pedidos y precio del buffet
+   */
   const calcularTotalGeneral = () => {
     const pedidoTotal = pedidos.reduce((total, pedido) => {
       return total + parseFloat(calcularTotalPedido(pedido.items));
     }, 0);
     
-    // Obtener precio del buffet del localStorage
     const comensalesData = localStorage.getItem('comensales');
     const precioBuffet = comensalesData 
       ? parseFloat(JSON.parse(comensalesData).precioBuffet || 0)
@@ -314,6 +331,219 @@ export default function ClientOrdersIsland() {
             <button class="btn-solicitar-ticket" onClick={solicitarTicket}>
               <i class="fa-solid fa-receipt"></i>
               Solicitar Ticket Físico
+            </button>
+          </div>
+        </div>
+      )}
+
+      {pantallaPagoAbierta && metodoPagoSeleccionado && (
+        <div class="modal-pago-overlay">
+          <div class="modal-pago-content pantalla-pago">
+            <div class="modal-pago-header">
+              <h3>
+                {metodoPagoSeleccionado === "Tarjeta" && <i class="fa-solid fa-credit-card"></i>}
+                {metodoPagoSeleccionado === "Efectivo" && <i class="fa-solid fa-money-bill-wave"></i>}
+                {metodoPagoSeleccionado === "Bizum" && <i class="fa-solid fa-mobile-screen"></i>}
+                {metodoPagoSeleccionado === "PayPal" && <i class="fa-brands fa-paypal"></i>}
+                {metodoPagoSeleccionado === "Google Pay" && <i class="fa-brands fa-google-pay"></i>}
+                {metodoPagoSeleccionado === "Apple Pay" && <i class="fa-brands fa-apple-pay"></i>}
+                Pagar con {metodoPagoSeleccionado}
+              </h3>
+              {!procesandoPago && (
+                <button class="modal-close-btn" onClick={cerrarPantallaPago}>
+                  <i class="fa-solid fa-times"></i>
+                </button>
+              )}
+            </div>
+
+            <div class="pantalla-pago-body">
+              <div class="pago-total-display">
+                <span class="pago-total-label">Total a pagar</span>
+                <span class="pago-total-amount">{calcularTotalGeneral()}€</span>
+              </div>
+
+              {metodoPagoSeleccionado === "Tarjeta" && (
+                <div class="formulario-pago">
+                  <div class="input-group">
+                    <label>Número de tarjeta</label>
+                    <input 
+                      type="text" 
+                      placeholder="1234 5678 9012 3456" 
+                      maxLength="19"
+                      disabled={procesandoPago}
+                    />
+                  </div>
+                  <div class="input-row">
+                    <div class="input-group">
+                      <label>Fecha de expiración</label>
+                      <input 
+                        type="text" 
+                        placeholder="MM/AA" 
+                        maxLength="5"
+                        disabled={procesandoPago}
+                      />
+                    </div>
+                    <div class="input-group">
+                      <label>CVV</label>
+                      <input 
+                        type="text" 
+                        placeholder="123" 
+                        maxLength="3"
+                        disabled={procesandoPago}
+                      />
+                    </div>
+                  </div>
+                  <div class="input-group">
+                    <label>Nombre del titular</label>
+                    <input 
+                      type="text" 
+                      placeholder="NOMBRE APELLIDOS" 
+                      disabled={procesandoPago}
+                    />
+                  </div>
+                </div>
+              )}
+
+              {metodoPagoSeleccionado === "Efectivo" && (
+                <div class="mensaje-efectivo">
+                  <i class="fa-solid fa-info-circle"></i>
+                  <p>Por favor, prepare el importe exacto o indique al camarero si necesita cambio.</p>
+                  <div class="efectivo-importe">
+                    <strong>{calcularTotalGeneral()}€</strong>
+                  </div>
+                </div>
+              )}
+
+              {metodoPagoSeleccionado === "Bizum" && (
+                <div class="formulario-pago">
+                  <div class="bizum-info">
+                    <i class="fa-solid fa-mobile-screen" style="font-size: 4rem; color: #00A9E0;"></i>
+                    <p>Introduce tu número de teléfono</p>
+                  </div>
+                  <div class="input-group">
+                    <label>Teléfono</label>
+                    <input 
+                      type="tel" 
+                      placeholder="612 345 678" 
+                      maxLength="11"
+                      disabled={procesandoPago}
+                    />
+                  </div>
+                  <div class="input-group">
+                    <label>Código de verificación</label>
+                    <input 
+                      type="text" 
+                      placeholder="123456" 
+                      maxLength="6"
+                      disabled={procesandoPago}
+                    />
+                  </div>
+                </div>
+              )}
+
+              {metodoPagoSeleccionado === "PayPal" && (
+                <div class="formulario-pago">
+                  <div class="paypal-logo">
+                    <i class="fa-brands fa-paypal" style="font-size: 5rem; color: #0070BA;"></i>
+                  </div>
+                  <div class="input-group">
+                    <label>Correo electrónico de PayPal</label>
+                    <input 
+                      type="email" 
+                      placeholder="correo@ejemplo.com" 
+                      disabled={procesandoPago}
+                    />
+                  </div>
+                  <div class="input-group">
+                    <label>Contraseña</label>
+                    <input 
+                      type="password" 
+                      placeholder="••••••••" 
+                      disabled={procesandoPago}
+                    />
+                  </div>
+                </div>
+              )}
+
+              {metodoPagoSeleccionado === "Google Pay" && (
+                <div class="pago-digital">
+                  <i class="fa-brands fa-google-pay" style="font-size: 6rem; color: #4285F4;"></i>
+                  <p>Confirma el pago en tu dispositivo</p>
+                  <div class="dispositivo-info">
+                    <i class="fa-solid fa-mobile-screen"></i>
+                    <span>Verifica tu identidad en tu teléfono</span>
+                  </div>
+                </div>
+              )}
+
+              {metodoPagoSeleccionado === "Apple Pay" && (
+                <div class="pago-digital">
+                  <i class="fa-brands fa-apple-pay" style="font-size: 6rem; color: #A6B1B7;"></i>
+                  <p>Confirma el pago con Face ID o Touch ID</p>
+                  <div class="dispositivo-info">
+                    <i class="fa-solid fa-fingerprint"></i>
+                    <span>Usa tu dispositivo Apple para confirmar</span>
+                  </div>
+                </div>
+              )}
+
+              <button 
+                class="btn-confirmar-pago"
+                onClick={confirmarPago}
+                disabled={procesandoPago}
+              >
+                {procesandoPago ? (
+                  <>
+                    <i class="fa-solid fa-spinner fa-spin"></i>
+                    Procesando...
+                  </>
+                ) : (
+                  <>
+                    <i class="fa-solid fa-lock"></i>
+                    Confirmar Pago
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {modalConfirmacionAbierto && (
+        <div class="modal-confirmacion-overlay">
+          <div class="modal-confirmacion-content">
+            <button class="modal-confirmacion-close" onClick={cerrarSesionCliente}>
+              <i class="fa-solid fa-times"></i>
+            </button>
+
+            <div class="modal-confirmacion-icon">
+              {tipoPago === "ticket" ? (
+                <i class="fa-solid fa-hourglass-half"></i>
+              ) : (
+                <i class="fa-solid fa-circle-check"></i>
+              )}
+            </div>
+            
+            <h2 class="modal-confirmacion-title">
+              {tipoPago === "ticket" 
+                ? "Esperando al camarero" 
+                : `Pago con ${tipoPago} confirmado`}
+            </h2>
+            
+            <p class="modal-confirmacion-mensaje">
+              {tipoPago === "ticket" 
+                ? "No cierre esta ventana. El camarero llegará en breve con su ticket." 
+                : "No cierre esta ventana. El camarero llegará en breve para finalizar el pago."}
+            </p>
+            
+            <div class="modal-confirmacion-info">
+              <i class="fa-solid fa-info-circle"></i>
+              <span>Por favor, permanezca en su mesa</span>
+            </div>
+
+            <button class="btn-cerrar-sesion" onClick={cerrarSesionCliente}>
+              <i class="fa-solid fa-door-open"></i>
+              Cerrar Sesión
             </button>
           </div>
         </div>

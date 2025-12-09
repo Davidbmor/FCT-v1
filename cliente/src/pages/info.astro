@@ -137,7 +137,10 @@ const imgUrl = producto?.url_imagen
                                                             class="alergeno-item"
                                                             title={alergeno.nombre}
                                                         >
-                                                            <span set:html={alergeno.svg} />
+                                                            <img 
+                                                                src={`http://localhost:3000${alergeno.ruta_imagen}`} 
+                                                                alt={alergeno.nombre}
+                                                            />
                                                         </div>
                                                     )
                                                 )}

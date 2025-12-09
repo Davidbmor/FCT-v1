@@ -11,8 +11,11 @@ export default function ModalComensales() {
     return (adultos * precioAdulto + ninos * precioNino).toFixed(2);
   };
 
+  /**
+   * Guarda la información de comensales en localStorage
+   * Calcula el precio total del buffet antes de navegar a la carta
+   */
   const handleConfirmar = () => {
-    // Guardar en localStorage
     const comensales = {
       adultos,
       ninos,
@@ -20,8 +23,6 @@ export default function ModalComensales() {
     };
     
     localStorage.setItem('comensales', JSON.stringify(comensales));
-    
-    // Continuar al menú
     window.location.href = '/carta';
   };
 

@@ -7,6 +7,7 @@ import "../assets/css/style.css";
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Tori & Roll - Buffet Libre Japonés</title>
+    <link rel="icon" type="image/png" href="/img/logo.png" />
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
@@ -44,7 +45,7 @@ import "../assets/css/style.css";
             <div class="step-icon">
               <i class="fas fa-utensils"></i>
             </div>
-            <h3>2. Elige tus Platos</h3>
+            <h3>1. Elige tus Platos</h3>
             <p>Selecciona hasta 10 productos por pedido de nuestra amplia variedad</p>
           </div>
           
@@ -52,7 +53,7 @@ import "../assets/css/style.css";
             <div class="step-icon">
               <i class="fas fa-clock"></i>
             </div>
-            <h3>3. Espera 3 Minutos</h3>
+            <h3>2. Espera 3 Minutos</h3>
             <p>Entre pedido y pedido debe pasar un mínimo de 3 minutos</p>
           </div>
           
@@ -60,7 +61,7 @@ import "../assets/css/style.css";
             <div class="step-icon">
               <i class="fas fa-infinity"></i>
             </div>
-            <h3>4. Come Sin Límite</h3>
+            <h3>3. Come Sin Límite</h3>
             <p>Disfruta de todos los platos que desees durante tu visita</p>
           </div>
         </div>
@@ -218,12 +219,10 @@ import "../assets/css/style.css";
     </footer>
 
     <script>
-      // Scroll suave para el indicador
       document.querySelector('.scroll-indicator')?.addEventListener('click', () => {
         document.querySelector('.how-it-works')?.scrollIntoView({ behavior: 'smooth' });
       });
 
-      // Animación al scroll
       const observerOptions = {
         threshold: 0.1,
         rootMargin: '0px 0px -50px 0px'
@@ -241,17 +240,18 @@ import "../assets/css/style.css";
         observer.observe(el);
       });
 
-      // Animación épica para los botones CTA
+      /**
+       * Crea efecto de transición animada con ripple desde el botón
+       * antes de navegar a la página de comensales
+       */
       function createEpicTransition(e) {
         e.preventDefault();
         const button = e.currentTarget;
         
-        // Crear overlay de transición
         const overlay = document.createElement('div');
         overlay.className = 'page-transition-overlay';
         document.body.appendChild(overlay);
         
-        // Crear efecto de ripple desde el botón
         const ripple = document.createElement('div');
         ripple.className = 'transition-ripple';
         const rect = button.getBoundingClientRect();
@@ -259,13 +259,11 @@ import "../assets/css/style.css";
         ripple.style.top = rect.top + rect.height / 2 + 'px';
         document.body.appendChild(ripple);
         
-        // Añadir clase de animación
         requestAnimationFrame(() => {
           overlay.classList.add('active');
           ripple.classList.add('active');
         });
         
-        // Redirigir al modal de comensales después de la animación
         setTimeout(() => {
           window.location.href = '/comensales';
         }, 800);

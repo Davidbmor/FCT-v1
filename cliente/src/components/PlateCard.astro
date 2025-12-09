@@ -11,7 +11,12 @@ const imgUrl = producto?.url_imagen ? `http://localhost:3000${producto.url_image
   </div>
   <div class="plate-details">
     <h2 class="plate-name">{name}</h2>
-    <p class="plate-amount">Cantidad : {amount}</p>
+    <div class="plate-info-row">
+      <p class="plate-amount">Cantidad : {amount}</p>
+      {producto?.precio && parseFloat(producto.precio) > 0 && (
+        <p class="plate-price">{parseFloat(producto.precio).toFixed(2)}€</p>
+      )}
+    </div>
     <div class="plate-buttons">
       <AddToCartIsland client:load producto={producto} />
       <button 

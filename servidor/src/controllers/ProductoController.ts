@@ -46,9 +46,13 @@ export class ProductoController {
     }
   };
 
+  /**
+   * Crea un nuevo producto en la base de datos
+   * Procesa imágenes base64, las guarda como archivos y asigna alérgenos
+   */
   añadirProducto = async (req: Request, res: Response) => {
     try {
-      const { nombre, tipo, descripcion, url_imagen, precio, alergenos } = req.body;
+      const { nombre, tipo, descripcion, url_imagen, precio, cantidad, alergenos } = req.body;
 
       if (!nombre || !tipo || precio === undefined) {
         return res.status(400).json({ 
@@ -73,7 +77,7 @@ export class ProductoController {
       const productoId = await this.productoModel.crear({
         nombre,
         tipo,
-        cantidad: 1,
+        cantidad: cantidad ? parseInt(cantidad) : 1,
         descripcion: descripcion || '',
         url_imagen: rutaImagen,
         precio: parseFloat(precio),
@@ -94,10 +98,14 @@ export class ProductoController {
     }
   };
 
+  /**
+   * Actualiza un producto existente
+   * Gestiona reemplazo de imágenes eliminando archivos antiguos
+   */
   editarProducto = async (req: Request, res: Response) => {
     try {
       const { id } = req.params;
-      const { nombre, tipo, descripcion, url_imagen, precio, alergenos } = req.body;
+      const { nombre, tipo, descripcion, url_imagen, precio, cantidad, alergenos } = req.body;
 
       const productoExistente = await this.productoModel.obtenerPorId(Number(id));
       if (!productoExistente) {
@@ -128,7 +136,7 @@ export class ProductoController {
       await this.productoModel.actualizar(Number(id), {
         nombre,
         tipo,
-        cantidad: productoExistente.cantidad,
+        cantidad: cantidad !== undefined ? parseInt(cantidad) : productoExistente.cantidad,
         descripcion: descripcion || '',
         url_imagen: rutaImagen,
         precio: parseFloat(precio),

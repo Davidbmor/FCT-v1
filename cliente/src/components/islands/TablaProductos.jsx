@@ -14,6 +14,10 @@ export default function TablaProductos() {
     window.recargarProductosGlobal = cargarProductos;
   }, []);
 
+  /**
+   * Obtiene todos los productos de la base de datos para el gestor
+   * Se ejecuta también tras crear/editar/eliminar productos
+   */
   const cargarProductos = async () => {
     try {
       const res = await fetch(`${API_URL}/productos/todos`);
@@ -50,6 +54,7 @@ export default function TablaProductos() {
             <th>Título</th>
             <th>Tipo</th>
             <th>Precio</th>
+            <th>Cantidad</th>
             <th>Alergenos</th>
             <th>Descripción</th>
             <th>Editar</th>
@@ -60,7 +65,7 @@ export default function TablaProductos() {
         <tbody>
           {productosFiltrados.length === 0 ? (
             <tr>
-              <td colspan="7" style={{ textAlign: 'center', padding: '20px' }}>
+              <td colspan="9" style={{ textAlign: 'center', padding: '20px' }}>
                 No hay productos
               </td>
             </tr>
@@ -83,6 +88,7 @@ export default function TablaProductos() {
                 <td>{producto.nombre || 'Sin nombre'}</td>
                 <td style={{ textTransform: 'capitalize' }}>{producto.tipo || 'Sin categoría'}</td>
                 <td>{producto.precio ? Number(producto.precio).toFixed(2) : '0.00'}€</td>
+                <td>{producto.cantidad || 1}</td>
                 <td>
                   {producto.alergenos && producto.alergenos.length > 0
                     ? producto.alergenos.map(a => a.nombre).join(', ')

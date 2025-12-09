@@ -43,6 +43,7 @@ const imgUrl = producto?.url_imagen ? `http://localhost:3000${producto.url_image
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Tori & Roll - {producto?.nombre || 'Información'}</title>
+        <link rel="icon" type="image/png" href="/img/logo.png" />
         <link
             rel="stylesheet"
             href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
@@ -90,7 +91,10 @@ const imgUrl = producto?.url_imagen ? `http://localhost:3000${producto.url_image
                                     <div class="alergies-list">
                                         {producto.alergenos.map((alergeno: any) => (
                                             <div class="alergeno-item" title={alergeno.nombre}>
-                                                <span set:html={alergeno.svg}></span>
+                                                <img 
+                                                    src={`http://localhost:3000${alergeno.ruta_imagen}`} 
+                                                    alt={alergeno.nombre}
+                                                />
                                             </div>
                                         ))}
                                     </div>

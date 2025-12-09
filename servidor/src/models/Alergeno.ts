@@ -3,7 +3,7 @@ import { Connection } from "mysql2/promise";
 export interface Alergeno {
   id: number;
   nombre: string;
-  svg: string;
+  ruta_imagen: string;
 }
 
 export class AlergenoModel {
@@ -15,7 +15,7 @@ export class AlergenoModel {
 
   async obtenerTodos(): Promise<Alergeno[]> {
     const [alergenos] = await this.db.query(
-      `SELECT id, nombre, svg FROM alergenos`
+      `SELECT id, nombre, ruta_imagen FROM alergenos`
     );
     return alergenos as Alergeno[];
   }

@@ -1,4 +1,3 @@
-// src/components/islands/GestorTicketsIsland.jsx
 import { useEffect, useState } from "preact/hooks";
 import { socket } from "../../lib/socket";
 import TicketStatusIsland from "../islands/TicketStatusIsland.jsx"; 
@@ -12,7 +11,6 @@ export default function GestorTicketsIsland() {
 
     const handleListaPedidos = (lista) => {
       if (!Array.isArray(lista)) return;
-      // Filtrar los pedidos que ya fueron eliminados localmente
       const pedidosFiltrados = lista.filter(p => !pedidosEliminados.has(p.id));
       setPedidos(pedidosFiltrados);
     };
@@ -24,13 +22,20 @@ export default function GestorTicketsIsland() {
     };
   }, [pedidosEliminados]);
 
+  /**
+   * Actualiza el estado de un pedido (en_espera -> en_preparacion -> terminado)
+   * Emite evento socket para sincronizar con todos los clientes
+   */
   function cambiarEstado(id, nuevoEstado) {
     socket.emit("actualizarEstado", { id, nuevoEstado });
   }
 
+  /**
+   * Elimina un pedido terminado del gestor de tickets
+   * Mantiene registro local para evitar reaparecer tras actualizaciones socket
+   */
   function eliminarPedido(id) {
     socket.emit("eliminarPedido", { id });
-    // Marcar el pedido como eliminado localmente
     setPedidosEliminados((prev) => new Set([...prev, id]));
     setPedidos((prev) => prev.filter((p) => p.id !== id));
   }

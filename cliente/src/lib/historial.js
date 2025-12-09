@@ -29,6 +29,10 @@ export class HistorialPedidos {
     }
   }
 
+  /**
+   * Actualiza un pedido existente o agrega uno nuevo
+   * Preserva la fecha original si el pedido ya existe
+   */
   actualizarPedido(pedidoActualizado) {
     const i = this.pedidos.findIndex(p => p.id === pedidoActualizado.id);
     if (i !== -1) {

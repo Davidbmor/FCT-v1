@@ -15,7 +15,7 @@ export interface Producto {
 export interface Alergeno {
   id: number;
   nombre: string;
-  svg: string;
+  ruta_imagen: string;
 }
 
 export class ProductoModel {
@@ -77,7 +77,7 @@ export class ProductoModel {
         pa.producto_id,
         a.id,
         a.nombre,
-        a.svg
+        a.ruta_imagen
       FROM producto_alergeno pa
       JOIN alergenos a ON a.id = pa.alergeno_id
     `);
@@ -86,7 +86,7 @@ export class ProductoModel {
       ...p,
       alergenos: (alergenos as any[])
         .filter((a) => a.producto_id === p.id)
-        .map((a) => ({ id: a.id, nombre: a.nombre, svg: a.svg })),
+        .map((a) => ({ id: a.id, nombre: a.nombre, ruta_imagen: a.ruta_imagen })),
     }));
   }
 
@@ -101,7 +101,7 @@ export class ProductoModel {
     const producto = (productos as any[])[0];
 
     const [alergenos] = await this.db.query(`
-      SELECT a.id, a.nombre, a.svg
+      SELECT a.id, a.nombre, a.ruta_imagen
       FROM producto_alergeno pa
       JOIN alergenos a ON a.id = pa.alergeno_id
       WHERE pa.producto_id = ?
@@ -180,12 +180,10 @@ export class ProductoModel {
     if ((rows as any[]).length === 0) return [];
 
     const columnType = (rows as any[])[0].COLUMN_TYPE;
-    // El formato es: enum('valor1','valor2','valor3')
     const match = columnType.match(/enum\((.*)\)/i);
     
     if (!match) return [];
 
-    // Extraer los valores del ENUM y limpiar las comillas
     const tipos = match[1]
       .split(',')
       .map((tipo: string) => tipo.replace(/'/g, '').trim());
