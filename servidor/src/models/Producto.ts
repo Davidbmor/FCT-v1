@@ -44,7 +44,7 @@ export class ProductoModel {
         pa.producto_id,
         a.id,
         a.nombre,
-        a.svg
+        a.ruta_imagen
       FROM producto_alergeno pa
       JOIN alergenos a ON a.id = pa.alergeno_id
     `);
@@ -53,7 +53,7 @@ export class ProductoModel {
       ...p,
       alergenos: (alergenos as any[])
         .filter((a) => a.producto_id === p.id)
-        .map((a) => ({ id: a.id, nombre: a.nombre, svg: a.svg })),
+        .map((a) => ({ id: a.id, nombre: a.nombre, ruta_imagen: a.ruta_imagen })),
     }));
   }
 

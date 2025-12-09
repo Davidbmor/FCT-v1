@@ -21,11 +21,20 @@ export default function TablaProductos() {
   const cargarProductos = async () => {
     try {
       const res = await fetch(`${API_URL}/productos/todos`);
+      if (!res.ok) {
+        throw new Error(`HTTP error! status: ${res.status}`);
+      }
       const data = await res.json();
-      setProductos(data);
+      console.log('Productos cargados:', data);
+      if (Array.isArray(data)) {
+        setProductos(data);
+      } else {
+        console.error('La respuesta no es un array:', data);
+        setProductos([]);
+      }
     } catch (err) {
       console.error('Error cargando productos:', err);
-      alert('Error cargando productos. Verifica que el servidor esté corriendo en http://localhost:3000');
+      setProductos([]);
     }
   };
 
